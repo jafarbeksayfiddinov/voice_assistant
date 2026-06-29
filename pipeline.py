@@ -1,9 +1,8 @@
-"""Shared RAG pipeline: load once at process startup, reuse for every request."""
 
 from sentence_transformers import SentenceTransformer, util
 
 from chunking_fixed import get_records, normalize_text
-import data
+import statics
 from ollama import ask_ollama
 
 print("[pipeline] loading embedding model...")
@@ -22,8 +21,7 @@ CONFIDENCE_THRESHOLD = 0.78  # tune against your own eval set
 
 
 def retrieve(question: str, k: int = 3, debug: bool = False):
-    """Returns the best-matching record's full text, or None if no record
-    clears the confidence threshold."""
+
     q_norm = normalize_text(question)
     query_emb = _model.encode([f"query: {q_norm}"], normalize_embeddings=True)
 
@@ -44,7 +42,6 @@ def retrieve(question: str, k: int = 3, debug: bool = False):
 
 
 def get_answer(question: str) -> str:
-    """Full text-in, text-out pipeline: retrieve context, ask the LLM."""
     context = retrieve(question, debug=True)
     if context is None:
         return "Bilmayman."

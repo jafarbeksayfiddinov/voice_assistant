@@ -1,14 +1,4 @@
-"""Speech-to-text via the Muxlisa AI API (https://muxlisa.uz) instead of local Whisper.
 
-SETUP:
-1. Register at https://muxlisa.uz/register and grab your API key from the dashboard.
-2. Put it in a .env file next to this file:
-       MUXLISA_API_KEY=your_real_key_here
-3. pip install python-dotenv (already in requirements.txt)
-4. Install ffmpeg (needed to convert the browser's webm/opus recording to wav,
-   which is the format Muxlisa's API example expects):
-       macOS:  brew install ffmpeg
-"""
 
 import os
 import subprocess
@@ -47,7 +37,6 @@ def _convert_to_wav(input_path: str) -> str:
 
 
 def transcribe(audio_path: str) -> str:
-    """Sends the recorded audio file to Muxlisa's STT API, returns the transcript."""
     if not API_KEY:
         raise RuntimeError(
             "MUXLISA_API_KEY is not set. Put it in a .env file next to muxlisa_stt.py."

@@ -31,11 +31,9 @@ def synthesize(text: str, speaker: int = DEFAULT_SPEAKER) -> tuple[bytes, str]:
 
     content_type = resp.headers.get("Content-Type", "")
 
-    # Case 1: API returned raw audio bytes directly.
     if "audio" in content_type or "octet-stream" in content_type:
         return resp.content, content_type or "audio/mpeg"
 
-    # Case 2: API returned JSON wrapping either base64 audio or a URL to fetch.
     try:
         data = resp.json()
     except ValueError:

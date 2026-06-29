@@ -1,4 +1,4 @@
-import data
+import statics
 
 import json
 

@@ -1,7 +1,7 @@
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
 from chunking_fixed import get_records, normalize_text
-import data
+import statics
 from ollama import ask_ollama
 
 model = SentenceTransformer("intfloat/multilingual-e5-base")
