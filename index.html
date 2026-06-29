@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQB Ovozli Yordamchi</title>
+<style>
+  :root {
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --border: #E4E7EC;
+    --text: #1C2230;
+    --muted: #6B7280;
+    --idle: #2F5DFF;
+    --idle-dark: #1E45D6;
+    --rec: #E2483D;
+    --rec-dark: #C53A30;
+    --processing: #F2A33B;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--text);
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 40px;
+    color: var(--text);
+  }
+
+  .mic-wrap {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--rec);
+    opacity: 0;
+  }
+
+  .recording .ring {
+    animation: pulse 1.6s ease-out infinite;
+  }
+  .recording .ring.delay {
+    animation-delay: 0.5s;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(0.7); opacity: 0.6; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+
+  #micBtn {
+    position: relative;
+    z-index: 1;
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    border: none;
+    background: var(--idle);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(47, 93, 255, 0.28);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  #micBtn:hover { transform: translateY(-1px); }
+  #micBtn:active { transform: translateY(0); }
+
+  #micBtn:disabled { cursor: not-allowed; }
+
+  .recording #micBtn {
+    background: var(--rec);
+    box-shadow: 0 8px 24px rgba(226, 72, 61, 0.32);
+  }
+
+  .processing #micBtn {
+    background: var(--processing);
+    box-shadow: 0 8px 24px rgba(242, 163, 59, 0.32);
+  }
+
+  #micBtn svg { width: 38px; height: 38px; }
+
+  .spinner {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+    display: none;
+  }
+  .processing .spinner { display: block; }
+  .processing #micBtn svg { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #status {
+    font-size: 14px;
+    color: var(--muted);
+    min-height: 20px;
+    margin-bottom: 32px;
+  }
+
+  .result {
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .result.visible { display: block; }
+
+  .result .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .result .body {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  #answerResult .body { color: var(--idle-dark); font-weight: 500; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring, .spinner { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="eyebrow">SQB &middot; Ovozli Yordamchi</div>
+    <h1>Savolingizni so'rang</h1>
+
+    <div class="mic-wrap" id="micWrap">
+      <div class="ring"></div>
+      <div class="ring delay"></div>
+      <button id="micBtn" aria-label="Mikrofonni yoqish">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+        <div class="spinner"></div>
+      </button>
+    </div>
+
+    <div id="status">Tugmani bosing va savolingizni ayting</div>
+
+    <div class="result" id="questionResult">
+      <div class="label">Savolingiz</div>
+      <div class="body" id="questionText"></div>
+    </div>
+
+    <div class="result" id="answerResult">
+      <div class="label">Javob</div>
+      <div class="body" id="answerText"></div>
+      <audio id="answerAudio" controls style="width:100%; margin-top:12px; display:none;"></audio>
+    </div>
+  </div>
+
+<script>
+  const micWrap = document.getElementById('micWrap');
+  const micBtn = document.getElementById('micBtn');
+  const statusEl = document.getElementById('status');
+  const questionResult = document.getElementById('questionResult');
+  const answerResult = document.getElementById('answerResult');
+  const questionText = document.getElementById('questionText');
+  const answerText = document.getElementById('answerText');
+
+  let mediaRecorder = null;
+  let chunks = [];
+  let state = 'idle'; // idle | recording | processing
+
+  function setState(next) {
+    state = next;
+    micWrap.classList.remove('recording', 'processing');
+    if (next === 'recording') micWrap.classList.add('recording');
+    if (next === 'processing') micWrap.classList.add('processing');
+    micBtn.disabled = (next === 'processing');
+  }
+
+  micBtn.addEventListener('click', async () => {
+    if (state === 'idle') {
+      await startRecording();
+    } else if (state === 'recording') {
+      stopRecording();
+    }
+  });
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        sendAudio();
+      };
+      mediaRecorder.start();
+      setState('recording');
+      statusEl.textContent = 'Tinglayapman... (tugatish uchun tugmani qayta bosing)';
+    } catch (err) {
+      statusEl.textContent = "Mikrofonga ruxsat berilmadi.";
+    }
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+    setState('processing');
+    statusEl.textContent = 'Qayta ishlanmoqda...';
+  }
+
+  async function sendAudio() {
+    try {
+      const blob = new Blob(chunks, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', blob, 'question.webm');
+
+      const res = await fetch('/api/ask', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Server xatosi: ' + res.status);
+      const data = await res.json();
+
+      questionText.textContent = data.transcript || '(aniqlanmadi)';
+      answerText.textContent = data.answer || 'Bilmayman.';
+      questionResult.classList.add('visible');
+      answerResult.classList.add('visible');
+
+      const audioEl = document.getElementById('answerAudio');
+      if (data.audio_base64) {
+        const byteChars = atob(data.audio_base64);
+        const byteNumbers = new Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+        const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'audio/mpeg' });
+        audioEl.src = URL.createObjectURL(blob);
+        audioEl.style.display = 'block';
+        audioEl.play().catch(() => { /* autoplay blocked -- user can press play manually */ });
+      } else {
+        audioEl.style.display = 'none';
+      }
+
+      statusEl.textContent = 'Tugmani bosing va savolingizni ayting';
+    } catch (err) {
+      statusEl.textContent = 'Xatolik: ' + err.message;
+    } finally {
+      setState('idle');
+    }
+  }
+</script>
+
+</body>
+</html>
