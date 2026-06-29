@@ -1,3 +1,4 @@
+"""Shared RAG pipeline: load once at process startup, reuse for every request."""
 
 from sentence_transformers import SentenceTransformer, util
 
@@ -9,7 +10,7 @@ print("[pipeline] loading embedding model...")
 _model = SentenceTransformer("intfloat/multilingual-e5-base")
 
 print("[pipeline] building credit-record corpus...")
-_records = get_records(data.PATH)                       # [{full, summary, turi}, ...]
+_records = get_records(statics.PATH)                       # [{full, summary, turi}, ...]
 _summaries = [normalize_text(r["summary"]) for r in _records]
 _doc_embeddings = _model.encode(
     [f"passage: {s}" for s in _summaries],
@@ -20,8 +21,12 @@ print(f"[pipeline] ready. {len(_records)} unique credit records loaded.")
 CONFIDENCE_THRESHOLD = 0.78  # tune against your own eval set
 
 
-def retrieve(question: str, k: int = 3, debug: bool = False):
+import time
 
+
+def retrieve(question: str, k: int = 3, debug: bool = False):
+    """Returns the best-matching record's full text, or None if no record
+    clears the confidence threshold."""
     q_norm = normalize_text(question)
     query_emb = _model.encode([f"query: {q_norm}"], normalize_embeddings=True)
 
@@ -42,11 +47,19 @@ def retrieve(question: str, k: int = 3, debug: bool = False):
 
 
 def get_answer(question: str) -> str:
+    """Full text-in, text-out pipeline: retrieve context, ask the LLM."""
+    t0 = time.perf_counter()
     context = retrieve(question, debug=True)
+    t1 = time.perf_counter()
+    print(f"[timing] retrieve: {t1 - t0:.2f}s")
+
     if context is None:
         return "Bilmayman."
 
     try:
-        return ask_ollama(question, context)
+        answer = ask_ollama(question, context)
+        t2 = time.perf_counter()
+        print(f"[timing] ollama generation: {t2 - t1:.2f}s")
+        return answer
     except Exception as e:
         return f"Xatolik yuz berdi: {e}"

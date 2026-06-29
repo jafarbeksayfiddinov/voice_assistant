@@ -13,7 +13,7 @@ def ask_ollama(question, context):
     messages = [
         {
             "role": "system",
-            "content": data.DOC_SYSTEM.format(context=context)
+            "content": statics.DOC_SYSTEM.format(context=context)
         },
         {
             "role": "user",
@@ -22,7 +22,7 @@ def ask_ollama(question, context):
     ]
 
     payload = {
-        "model": data.MODEL,
+        "model": statics.MODEL,
         "messages": messages,
         "stream": True,
         "options": {
@@ -35,7 +35,7 @@ def ask_ollama(question, context):
     full = ""
 
     with requests.post(
-        data.OLLAMA_URL,
+        statics.OLLAMA_URL,
         json=payload,
         stream=True,
         timeout=120

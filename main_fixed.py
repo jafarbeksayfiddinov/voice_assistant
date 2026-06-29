@@ -7,7 +7,7 @@ from ollama import ask_ollama
 model = SentenceTransformer("intfloat/multilingual-e5-base")
 
 # --- Build the corpus -------------------------------------------------
-records = get_records(data.PATH)                       # [{full, summary, turi}, ...]
+records = get_records(statics.PATH)                       # [{full, summary, turi}, ...]
 summaries = [normalize_text(r["summary"]) for r in records]
 
 # Embed the SHORT denoised summary, not the 2000+ char raw chunk.
@@ -40,7 +40,7 @@ def retrieve(question, k=2, debug=False):
 
 
 if __name__ == "__main__":
-    for question in data.test_questions_tiny:
+    for question in statics.test_questions_tiny:
         print("-" * 50)
         print(question)
 
