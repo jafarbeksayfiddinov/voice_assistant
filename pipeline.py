@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer, util
 
 from chunking_fixed import get_records, normalize_text
 import statics
+from gemini import ask_gemini_flash
 from ollama import ask_ollama
 
 print("[pipeline] loading embedding model...")
@@ -57,7 +58,7 @@ def get_answer(question: str) -> str:
         return "Bilmayman."
 
     try:
-        answer = ask_ollama(question, context)
+        answer = ask_gemini_flash(question, context)
         t2 = time.perf_counter()
         print(f"[timing] ollama generation: {t2 - t1:.2f}s")
         return answer

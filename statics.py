@@ -1,4 +1,3 @@
-
 DOCS = [
     # 🚗 Car / Auto loans
     "Avto kredit olish shartlari",
@@ -90,7 +89,7 @@ QOIDALAR:
 7. Javobdan oldin yoki keyin izoh yozma.
 8. "Savol:" yoki "Javob:" so'zlarini yozma.
 9. Faqat yakuniy javobni qaytar.
-10. Har bir raqam muhim hisoblanadi. Pul miqdori, foiz stavkasi, kredit muddati, yosh chegarasi va boshqa sonli ma'lumotlarni KONTEXTdan aynan ko'chir. Birorta raqamни o'zgartirma, qisqartirma, yaxlitlama yoki taxmin qilma.
+10. "Faqat javobni beram", "Mana javob", "Javob shu" kabi kirish so'zlarini ISHLATMA. Javobni to'g'ridan-to'g'ri raqam/fakt bilan boshla.
 
 KONTEXT:
 {context}
